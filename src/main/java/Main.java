@@ -1,20 +1,20 @@
+import controller.ExecutionPlanner;
+
 /**
- * Classe principal utilizada para inicialização do programa
- * Created by raque on 06/11/2017.
+ * Classe principal utilizada para inicialização do programa.
  */
 public class Main {
 
     public static void main(String[] args) {
-        String path = "C:\\Raquel\\Pessoal\\CurriculoRaquelGodoyThiele.pdf";
-        PdfManager manager = new PdfManager(path);
-        try{
-
-            manager.parse();
-        }catch(Exception e){
-
+        if (args.length != 2){
+            System.out.println("Error: Two arguments are required to initialize this program.");
+            System.exit(1);
         }
 
-
+        ExecutionPlanner executionPlanner = ExecutionPlanner.getInstance();
+        executionPlanner.setDegreeSchedulePath(args[0]);
+        executionPlanner.setAcademicTranscriptPath(args[1]);
+        executionPlanner.run();
     }
 
 }
