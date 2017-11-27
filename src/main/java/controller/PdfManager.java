@@ -33,7 +33,7 @@ public class PdfManager {
         return null;
     }
 
-    public void processPage(AcademicTranscript academicTranscript, String pageContent){
+    private void processPage(AcademicTranscript academicTranscript, String pageContent){
         String [] lines = pageContent.split("\\n");
         boolean hasRegistrationNumber = false;
         boolean hasCurrentSemester = false;
@@ -61,19 +61,19 @@ public class PdfManager {
         }
     }
 
-    public static boolean hasRegistrationNumber(String line){
+    private static boolean hasRegistrationNumber(String line){
         return ( line.contains("Matrícula:"));
     }
 
-    public static boolean hasCurrentSemester(String line){
+    private static boolean hasCurrentSemester(String line){
         return ( line.contains("Período Atual:"));
     }
 
-    public static boolean hasGradePointAverage(String line){
+    private static boolean hasGradePointAverage(String line){
         return ( line.contains("Coeficiente de Rendimento Geral:"));
     }
 
-    public static boolean hasGrade(String line){
+    private static boolean hasGrade(String line){
         return ( line.contains("APV") || line.contains("REF") || line.contains("REP "));
     }
 

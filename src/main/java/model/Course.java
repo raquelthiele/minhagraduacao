@@ -57,9 +57,9 @@ public class Course {
     @Override
     public String toString() {
         StringBuilder printBuilder = new StringBuilder("--------------");
-        String lineBreak = "\n";
+        String lineBreak = "<br />";
         printBuilder.append(lineBreak);
-        printBuilder.append(" Course Code :");
+        printBuilder.append(" Course Code: ");
         printBuilder.append(this.code);
         printBuilder.append(lineBreak);
 //        printBuilder.append(" Course Name :");
@@ -68,7 +68,7 @@ public class Course {
 //        printBuilder.append(" Credit Points :");
 //        printBuilder.append(this.creditPoints);
 //        printBuilder.append(lineBreak);
-        printBuilder.append(" Status :");
+        printBuilder.append(" Status: ");
         printBuilder.append(lineBreak);
         for(CourseStatus stat : status){
             printBuilder.append("    " + stat.toString());

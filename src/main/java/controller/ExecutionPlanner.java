@@ -43,8 +43,8 @@ public class ExecutionPlanner {
         AcademicTranscript academicTranscript = manager.initializeReadingAndProcessingPdf(academicTranscriptPath);
 
         if (academicTranscript != null) {
-            SvgPrinter svgPrinter = new SvgPrinter();
-            svgPrinter.printSvg();
+            HtmlGenerator htmlGenerator = new HtmlGenerator();
+            htmlGenerator.generateHtmlFile(degreeSchedulePath, academicTranscript);
         }
     }
 }

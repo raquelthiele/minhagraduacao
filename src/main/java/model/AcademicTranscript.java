@@ -82,7 +82,7 @@ public class AcademicTranscript {
     @Override
     public String toString(){
         StringBuilder printBuilder = new StringBuilder();
-        String lineBreak = "\n";
+        String lineBreak = "<br />";
 
         printBuilder.append("Student Registration Number: ");
         printBuilder.append(this.registrationNumber);
@@ -96,7 +96,7 @@ public class AcademicTranscript {
         printBuilder.append("Student GPA: ");
         printBuilder.append(this.gradePointAverage);
         printBuilder.append(lineBreak);
-        printBuilder.append("Courses :");
+        printBuilder.append("Courses: ");
         printBuilder.append(lineBreak);
         for(Course course : this.coursers){
             printBuilder.append(course);
