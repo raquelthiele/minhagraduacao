@@ -11,13 +11,12 @@ public class Course {
     private String code;
     private String name;
     private int creditPoints;
+    private List<CourseStatus> status;
     private HashMap<Enum<CourseStatus>,List<Double>> statusGradeMap;
 
-    public Course(String code, String name, int creditPoints) {
+    public Course(String code) {
         this.code = code;
-        this.name = name;
-        this.creditPoints = creditPoints;
-        this.statusGradeMap = new HashMap<Enum<CourseStatus>,List<Double>>();
+        this.status = new ArrayList<CourseStatus>();
     }
 
     public String getCode() {
@@ -30,6 +29,14 @@ public class Course {
 
     public int getCreditPoints() {
         return creditPoints;
+    }
+
+    public List<CourseStatus> getStatus() {
+        return status;
+    }
+
+    public void addStatus(CourseStatus status) {
+        this.status.add(status);
     }
 
     public HashMap<Enum<CourseStatus>,List<Double>> getStatusGradeMap() {
@@ -45,5 +52,30 @@ public class Course {
         else{
             this.statusGradeMap.get(courseStatus).add(grade);
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder printBuilder = new StringBuilder("--------------");
+        String lineBreak = "\n";
+        printBuilder.append(lineBreak);
+        printBuilder.append(" Course Code :");
+        printBuilder.append(this.code);
+        printBuilder.append(lineBreak);
+//        printBuilder.append(" Course Name :");
+//        printBuilder.append(this.name);
+//        printBuilder.append(lineBreak);
+//        printBuilder.append(" Credit Points :");
+//        printBuilder.append(this.creditPoints);
+//        printBuilder.append(lineBreak);
+        printBuilder.append(" Status :");
+        printBuilder.append(lineBreak);
+        for(CourseStatus stat : status){
+            printBuilder.append("    " + stat.toString());
+            printBuilder.append(lineBreak);
+        }
+
+        return printBuilder.toString();
+
     }
 }

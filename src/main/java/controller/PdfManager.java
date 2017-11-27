@@ -1,9 +1,11 @@
-package model;
+package controller;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
 import com.itextpdf.kernel.pdf.canvas.parser.listener.ITextExtractionStrategy;
 import com.itextpdf.kernel.pdf.canvas.parser.listener.SimpleTextExtractionStrategy;
+import model.AcademicTranscript;
+import model.CourseStatus;
 
 import java.io.IOException;
 
@@ -13,32 +15,26 @@ import java.io.IOException;
  */
 public class PdfManager {
 
-    private String path;
-
-    public PdfManager(String path) {
-        this.path = path;
-    }
-
-    public String read() {
+    public AcademicTranscript initializeReadingAndProcessingPdf(String academicTranscriptPath) {
+        AcademicTranscript academicTranscript = new AcademicTranscript();
         try {
-            PdfDocument pdfDoc = new PdfDocument(new PdfReader(path));
-            String pagesContent = new String();
+            PdfDocument pdfDoc = new PdfDocument(new PdfReader(academicTranscriptPath));
             for (int page = 1; page <= pdfDoc.getNumberOfPages(); page++) {
                 ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-                pagesContent += PdfTextExtractor.getTextFromPage(pdfDoc.getPage(page), strategy);
+                processPage(academicTranscript, PdfTextExtractor.getTextFromPage(pdfDoc.getPage(page), strategy));
             }
-
+            System.out.println(academicTranscript.toString());
             pdfDoc.close();
-            return pagesContent;
+            return academicTranscript;
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "Error on reading pdf.";
+        return null;
     }
-    public void processPdf(String pagesContent){
-        AcademicTranscript academicTranscript = new AcademicTranscript();
-        String [] lines = pagesContent.split("\\n");
+
+    public void processPage(AcademicTranscript academicTranscript, String pageContent){
+        String [] lines = pageContent.split("\\n");
         boolean hasRegistrationNumber = false;
         boolean hasCurrentSemester = false;
         boolean hasGradePointAverage = false;
@@ -60,11 +56,9 @@ public class PdfManager {
                 academicTranscript.setGradePointAverage(Double.parseDouble(words[4].replaceAll(",","\\.")));
             }
             if (hasGrade(line)){
-
+                processGradeLine(academicTranscript, line);
             }
-            System.out.println(line);
         }
-        System.out.println(academicTranscript.toString());
     }
 
     public static boolean hasRegistrationNumber(String line){
@@ -74,13 +68,28 @@ public class PdfManager {
     public static boolean hasCurrentSemester(String line){
         return ( line.contains("Período Atual:"));
     }
+
     public static boolean hasGradePointAverage(String line){
         return ( line.contains("Coeficiente de Rendimento Geral:"));
     }
 
     public static boolean hasGrade(String line){
-        return ( line.contains("APV") || line.contains("DIS") || line.contains("REP"));
+        return ( line.contains("APV") || line.contains("REF") || line.contains("REP "));
     }
 
+    private static void processGradeLine(AcademicTranscript academicTranscript, String line){
+        String [] words = line.split("\\s+");
+        CourseStatus status;
+        if (line.contains("APV")){
+            status = CourseStatus.APV;
+        }
+        else if (line.contains("REF")){
+            status = CourseStatus.REF;
+        }
+        else {
+            status = CourseStatus.REP;
+        }
+        academicTranscript.addCourse(words[0], status);
+    }
 
 }

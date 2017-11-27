@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,6 +15,7 @@ public class AcademicTranscript {
     private Double gradePointAverage;
 
     public AcademicTranscript() {
+        this.coursers = new ArrayList<Course>();
     }
 
     public String getRegistrationNumber() {
@@ -45,8 +47,20 @@ public class AcademicTranscript {
         return coursers;
     }
 
-    public void setCoursers(List<Course> coursers) {
-        this.coursers = coursers;
+    public void addCourse(String courseCode, CourseStatus status) {
+        boolean hasCourse = false;
+        for(Course course : coursers){
+            if(course.getCode().equals(courseCode)){
+                course.addStatus(status);
+                hasCourse = true;
+                break;
+            }
+        }
+        if (!hasCourse){
+            Course course = new Course(courseCode);
+            course.addStatus(status);
+            this.coursers.add(course);
+        }
     }
 
     public int getTotalCreditPoints() {
@@ -67,9 +81,28 @@ public class AcademicTranscript {
 
     @Override
     public String toString(){
-        return "Student Registration Number: " + this.registrationNumber + "\n"
-                + "Student Registration Date: " + this.registrationDate + "\n"
-                + "Student Current Semester: " + this.currentSemester  + "\n"
-                + "Student GPA: " + this.gradePointAverage + "\n";
+        StringBuilder printBuilder = new StringBuilder();
+        String lineBreak = "\n";
+
+        printBuilder.append("Student Registration Number: ");
+        printBuilder.append(this.registrationNumber);
+        printBuilder.append(lineBreak);
+        printBuilder.append("Student Registration Date: ");
+        printBuilder.append(this.registrationDate);
+        printBuilder.append(lineBreak);
+        printBuilder.append("Student Current Semester: ");
+        printBuilder.append(this.currentSemester);
+        printBuilder.append(lineBreak);
+        printBuilder.append("Student GPA: ");
+        printBuilder.append(this.gradePointAverage);
+        printBuilder.append(lineBreak);
+        printBuilder.append("Courses :");
+        printBuilder.append(lineBreak);
+        for(Course course : this.coursers){
+            printBuilder.append(course);
+            printBuilder.append(lineBreak);
+        }
+        return  printBuilder.toString();
+
     }
 }

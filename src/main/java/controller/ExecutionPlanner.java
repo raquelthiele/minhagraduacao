@@ -1,5 +1,6 @@
 package controller;
-import model.PdfManager;
+
+import model.AcademicTranscript;
 
 /**
  *
@@ -38,10 +39,12 @@ public class ExecutionPlanner {
     }
 
     public static void run(){
-        PdfManager manager = new PdfManager(academicTranscriptPath);
-        manager.processPdf(manager.read());
+        PdfManager manager = new PdfManager();
+        AcademicTranscript academicTranscript = manager.initializeReadingAndProcessingPdf(academicTranscriptPath);
 
-        SvgPrinter svgPrinter = new SvgPrinter();
-        svgPrinter.printSvg();
+        if (academicTranscript != null) {
+            SvgPrinter svgPrinter = new SvgPrinter();
+            svgPrinter.printSvg();
+        }
     }
 }
