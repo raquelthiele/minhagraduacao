@@ -1,5 +1,7 @@
 package model;
 
+import controller.HtmlGenerator;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,14 +10,25 @@ import java.util.List;
  */
 public class AcademicTranscript {
     private String registrationNumber;
-    private String registrationDate;
-    private String currentSemester;
+    private Integer registrationDate;
+    private Integer currentSemester;
     private List<Course> coursers;
     private int totalCreditPoints;
     private Double gradePointAverage;
+    private int approvedOnCoursesQuantity;
+    private int enrolledCoursesQuantity;
+
+    private static final Integer FIRST_REGULATION = 20132;
+    private static final Integer SECOND_REGULATION = 20141;
+    private static final Integer COURSES_QUANTITY_TO_GRADUATE = 47;
+    private static final Double AVERAGE_GRADE = 7.0;
+    private static final Integer MIN_ENROlLED_COURSES = 3;
+    private static final Double MAX_COURSES_PER_SEMESTER = 7.0;
 
     public AcademicTranscript() {
         this.coursers = new ArrayList<Course>();
+        this.approvedOnCoursesQuantity = 0;
+        this.enrolledCoursesQuantity = 0;
     }
 
     public String getRegistrationNumber() {
@@ -27,19 +40,19 @@ public class AcademicTranscript {
         setRegistrationDate(this.registrationNumber);
     }
 
-    public String getRegistrationDate() {
+    public int getRegistrationDate() {
         return registrationDate;
     }
 
     public void setRegistrationDate(String registrationNumber) {
-        this.registrationDate = registrationNumber.substring(0, Math.min(registrationNumber.length(), 5));
+        this.registrationDate = Integer.parseInt(registrationNumber.substring(0, Math.min(registrationNumber.length(), 5)));
     }
 
-    public String getCurrentSemester() {
+    public Integer getCurrentSemester() {
         return currentSemester;
     }
 
-    public void setCurrentSemester(String currentSemester) {
+    public void setCurrentSemester(Integer currentSemester) {
         this.currentSemester = currentSemester;
     }
 
@@ -61,6 +74,8 @@ public class AcademicTranscript {
             course.addStatus(status);
             this.coursers.add(course);
         }
+        if (status.equals(CourseStatus.ASC)) enrolledCoursesQuantity++;
+        else if (status.equals(CourseStatus.APV)) approvedOnCoursesQuantity++;
     }
 
     public int getTotalCreditPoints() {
@@ -79,28 +94,67 @@ public class AcademicTranscript {
         this.gradePointAverage = gradePointAverage;
     }
 
+    public boolean hasMoreThanFourFlunksInTheSameCourse(){
+        for (Course course : coursers){
+            if (course.getFlunksQuantity() >= 4){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasToShowPlan(){
+        int compareTo = registrationDate.compareTo(SECOND_REGULATION);
+        if(compareTo >= 0 ){
+            if (this.currentSemester > 6) return true;
+        } else {
+            if (this.currentSemester > 10) return true;
+        }
+        return  false;
+    }
+
+    public boolean isEnrolledAtEnoughCourses(){
+        if (enrolledCoursesQuantity >= MIN_ENROlLED_COURSES) return true;
+        int coursersToDo = COURSES_QUANTITY_TO_GRADUATE - approvedOnCoursesQuantity;
+        if (coursersToDo == enrolledCoursesQuantity) return true;
+        return false;
+    }
+
+    public boolean canGraduateOnTime(){
+        int coursersToDo = COURSES_QUANTITY_TO_GRADUATE - approvedOnCoursesQuantity;
+        int semestersNeededToGraduate = ((int) Math.ceil(coursersToDo / MAX_COURSES_PER_SEMESTER));
+        int compareTo = registrationDate.compareTo(SECOND_REGULATION);
+        if(compareTo >= 0 ){
+            if ((currentSemester + semestersNeededToGraduate - 1) >= 12) return false;
+        } else {
+            if ((currentSemester + semestersNeededToGraduate -1) >= 14) return false;
+        }
+        return true;
+    }
+
+    public  boolean isGpaHigherOrLowerThanAverage(){
+        return (this.gradePointAverage >= AVERAGE_GRADE);
+    }
+
     @Override
     public String toString(){
         StringBuilder printBuilder = new StringBuilder();
-        String lineBreak = "<br />";
-
         printBuilder.append("Student Registration Number: ");
         printBuilder.append(this.registrationNumber);
-        printBuilder.append(lineBreak);
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append("Student Registration Date: ");
-        printBuilder.append(this.registrationDate);
-        printBuilder.append(lineBreak);
+        printBuilder.append(this.registrationDate.toString());
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append("Student Current Semester: ");
-        printBuilder.append(this.currentSemester);
-        printBuilder.append(lineBreak);
-        printBuilder.append("Student GPA: ");
+        printBuilder.append(this.currentSemester.toString());
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
+        printBuilder.append("Student Grade Point Average: ");
         printBuilder.append(this.gradePointAverage);
-        printBuilder.append(lineBreak);
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append("Courses: ");
-        printBuilder.append(lineBreak);
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
         for(Course course : this.coursers){
             printBuilder.append(course);
-            printBuilder.append(lineBreak);
         }
         return  printBuilder.toString();
 

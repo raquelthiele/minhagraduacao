@@ -48,7 +48,7 @@ public class PdfManager {
             if (!hasCurrentSemester && hasCurrentSemester(line)){
                 hasCurrentSemester = true;
                 String [] words = line.split("\\s+");
-                academicTranscript.setCurrentSemester(words[2]);
+                academicTranscript.setCurrentSemester(Integer.parseInt(words[2].substring(0, Math.min(2, words[2].length()))));
             }
             if (!hasGradePointAverage && hasGradePointAverage(line)){
                 hasGradePointAverage = true;
@@ -74,13 +74,16 @@ public class PdfManager {
     }
 
     private static boolean hasGrade(String line){
-        return ( line.contains("APV") || line.contains("REF") || line.contains("REP "));
+        return ( line.contains("ASC - Matrícula") || line.contains("APV") || line.contains("REF") || line.contains("REP "));
     }
 
     private static void processGradeLine(AcademicTranscript academicTranscript, String line){
         String [] words = line.split("\\s+");
         CourseStatus status;
-        if (line.contains("APV")){
+        if (line.contains("ASC - Matrícula")){
+            status = CourseStatus.ASC;
+        }
+        else if (line.contains("APV")){
             status = CourseStatus.APV;
         }
         else if (line.contains("REF")){

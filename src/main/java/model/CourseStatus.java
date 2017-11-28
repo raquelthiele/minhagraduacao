@@ -6,7 +6,8 @@ package model;
 public enum CourseStatus {
     REF("Reprovado Por Faltas"),
     REP("Reprovado"),
-    APV("Aprovado");
+    APV("Aprovado"),
+    ASC("Matrícula");
 
     private final String courseStatus;
 

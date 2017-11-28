@@ -1,5 +1,7 @@
 package model;
 
+import controller.HtmlGenerator;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,12 +13,14 @@ public class Course {
     private String code;
     private String name;
     private int creditPoints;
-    private List<CourseStatus> status;
+    private int flunksQuantity;
+    private List<CourseStatus> statusList;
     private HashMap<Enum<CourseStatus>,List<Double>> statusGradeMap;
 
     public Course(String code) {
         this.code = code;
-        this.status = new ArrayList<CourseStatus>();
+        this.flunksQuantity = 0;
+        this.statusList = new ArrayList<CourseStatus>();
     }
 
     public String getCode() {
@@ -31,12 +35,19 @@ public class Course {
         return creditPoints;
     }
 
-    public List<CourseStatus> getStatus() {
-        return status;
+    public int getFlunksQuantity() {
+        return flunksQuantity;
+    }
+
+    public List<CourseStatus> getStatusList() {
+        return statusList;
     }
 
     public void addStatus(CourseStatus status) {
-        this.status.add(status);
+        this.statusList.add(status);
+        if(status.equals(CourseStatus.REF) || status.equals(CourseStatus.REP)){
+            flunksQuantity++;
+        }
     }
 
     public HashMap<Enum<CourseStatus>,List<Double>> getStatusGradeMap() {
@@ -54,14 +65,17 @@ public class Course {
         }
     }
 
+    public CourseStatus lastStatus(){
+        return statusList.get(statusList.size()-1);
+    }
+
     @Override
     public String toString() {
         StringBuilder printBuilder = new StringBuilder("--------------");
-        String lineBreak = "<br />";
-        printBuilder.append(lineBreak);
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append(" Course Code: ");
         printBuilder.append(this.code);
-        printBuilder.append(lineBreak);
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
 //        printBuilder.append(" Course Name :");
 //        printBuilder.append(this.name);
 //        printBuilder.append(lineBreak);
@@ -69,10 +83,10 @@ public class Course {
 //        printBuilder.append(this.creditPoints);
 //        printBuilder.append(lineBreak);
         printBuilder.append(" Status: ");
-        printBuilder.append(lineBreak);
-        for(CourseStatus stat : status){
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
+        for(CourseStatus stat : statusList){
             printBuilder.append("    " + stat.toString());
-            printBuilder.append(lineBreak);
+            printBuilder.append(HtmlGenerator.LINE_BREAK);
         }
 
         return printBuilder.toString();

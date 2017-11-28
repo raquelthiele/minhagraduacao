@@ -4,6 +4,7 @@ package model;
  *
  */
 public class Major {
+
     private static final String[] mandatoryMajor = {
             "TIN0054", // ATIVIDADES CURRICULARES DE EXTENSÃO 1
             "TIN0055", // ATIVIDADES CURRICULARES DE EXTENSÃO 2
