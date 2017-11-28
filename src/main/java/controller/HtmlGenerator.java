@@ -1,5 +1,15 @@
 package controller;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+import java.io.File;
 import model.AcademicTranscript;
 
 import java.io.*;
@@ -13,8 +23,8 @@ public class HtmlGenerator {
     public static final String HIGHER = "higher";
     public static final String LOWER = "lower";
     public static final String LINE_BREAK = "<br/>";
-    public static final String HTML_HEADER = "<!DOCTYPE html>\n<html>\n<body>\n<h1>Degree Schedule</h1>\n" ;
-    public static final String HTML_FOOTER = "</body>\n</html>";
+    private static final String HTML_HEADER = "<!DOCTYPE html>\n<html>\n<body>\n<h1>Degree Schedule</h1>\n" ;
+    private static final String HTML_FOOTER = "</body>\n</html>";
 
     public void generateHtmlFile(String degreeSchedulePath, AcademicTranscript academicTranscript) {
         BufferedWriter bw = null;
@@ -42,58 +52,12 @@ public class HtmlGenerator {
         printBuilder.append(LINE_BREAK);
         printBuilder.append(academicTranscript.toString());
         printBuilder.append(LINE_BREAK);
-        printBuilder.append(readSvg(degreeSchedulePath));
         printBuilder.append(LINE_BREAK);
         printBuilder.append(answerQuestions(academicTranscript));
         printBuilder.append(LINE_BREAK);
+        printBuilder.append(readSvg(degreeSchedulePath));
         printBuilder.append(HTML_FOOTER);
         return printBuilder.toString();
-    }
-
-    private String readSvg(String degreeSchedulePath){
-        BufferedReader br = null;
-        InputStreamReader inputStreamReader = null;
-        FileInputStream fileInputStream = null;
-        FileReader fr = null;
-        StringBuilder svgFile = new StringBuilder();
-
-        try {
-            fileInputStream = new FileInputStream(degreeSchedulePath);
-            inputStreamReader = new InputStreamReader(fileInputStream, "UTF8" );
-            fr = new FileReader(degreeSchedulePath);
-            br = new BufferedReader(inputStreamReader);
-            String currentLine;
-            boolean hasSvgTag = false;
-            String lineBreak = "\n";
-            while ((currentLine = br.readLine()) != null) {
-                if (hasSvgTag || hasSvgTag(currentLine)){
-                    hasSvgTag = true;
-                    svgFile.append(lineBreak);
-                    svgFile.append(currentLine);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (br != null) br.close();
-                if (fr != null) fr.close();
-                if (inputStreamReader != null) inputStreamReader.close();
-                if (fileInputStream != null) fileInputStream.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        return svgFile.toString();
-    }
-
-    private boolean hasSvgTag(String currentLine){
-        return (currentLine.contains("<svg"));
-    }
-
-    private String paintSvg(){
-        return "";
     }
 
     private String answerQuestions(AcademicTranscript academicTranscript){
@@ -124,5 +88,41 @@ public class HtmlGenerator {
 
     public String translateHigherOrLower(boolean trueOrFalse){
         return (trueOrFalse ? HIGHER : LOWER);
+    }
+
+    private String readSvg(String degreeSchedulePath){
+        String svgFile = null;
+        try {
+            File fXmlFile = new File(degreeSchedulePath);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(fXmlFile);
+            doc.getDocumentElement().normalize();
+
+            paintSvg(doc);
+
+            StringWriter stringOut = new StringWriter();
+            OutputFormat format = new OutputFormat(doc);
+            XMLSerializer serial = new XMLSerializer(stringOut, format);
+            serial.serialize(doc);
+            svgFile = stringOut.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return svgFile;
+    }
+
+    private Document paintSvg(Document document){
+        NodeList pathsNodesList = document.getElementsByTagName("path");
+        for (int i = 0; i < pathsNodesList.getLength(); i++) {
+            Element pathElement = (Element) pathsNodesList.item(i);
+            String pathId = pathElement.getAttributes().getNamedItem("id").getNodeValue();
+            if (pathId.matches("[A-Z]{3}[0-9]{4}")){
+                Node pathStyle = pathElement.getAttributes().getNamedItem("style");
+                String replacedStyleValue = pathStyle.getNodeValue().replaceAll("#ffffff", "#00ff00");
+                pathStyle.setNodeValue(replacedStyleValue);
+            }
+        }
+        return document;
     }
 }
