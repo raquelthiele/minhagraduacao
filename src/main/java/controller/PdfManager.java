@@ -1,4 +1,5 @@
 package controller;
+
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
@@ -14,52 +15,6 @@ import java.io.IOException;
  *
  */
 public class PdfManager {
-
-    public AcademicTranscript initializeReadingAndProcessingPdf(String academicTranscriptPath) {
-        AcademicTranscript academicTranscript = new AcademicTranscript();
-        try {
-            PdfDocument pdfDoc = new PdfDocument(new PdfReader(academicTranscriptPath));
-            for (int page = 1; page <= pdfDoc.getNumberOfPages(); page++) {
-                ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-                processPage(academicTranscript, PdfTextExtractor.getTextFromPage(pdfDoc.getPage(page), strategy));
-            }
-            System.out.println(academicTranscript.toString());
-            pdfDoc.close();
-            return academicTranscript;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private void processPage(AcademicTranscript academicTranscript, String pageContent){
-        String [] lines = pageContent.split("\\n");
-        boolean hasRegistrationNumber = false;
-        boolean hasCurrentSemester = false;
-        boolean hasGradePointAverage = false;
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-            if (!hasRegistrationNumber && hasRegistrationNumber(line)){
-                hasRegistrationNumber = true;
-                String [] words = line.split("\\s+");
-                academicTranscript.setRegistrationNumber(words[0]);
-            }
-            if (!hasCurrentSemester && hasCurrentSemester(line)){
-                hasCurrentSemester = true;
-                String [] words = line.split("\\s+");
-                academicTranscript.setCurrentSemester(Integer.parseInt(words[2].substring(0, Math.min(2, words[2].length()))));
-            }
-            if (!hasGradePointAverage && hasGradePointAverage(line)){
-                hasGradePointAverage = true;
-                String [] words = line.split("\\s+");
-                academicTranscript.setGradePointAverage(Double.parseDouble(words[4].replaceAll(",","\\.")));
-            }
-            if (hasGrade(line)){
-                processGradeLine(academicTranscript, line);
-            }
-        }
-    }
 
     private static boolean hasRegistrationNumber(String line){
         return ( line.contains("Matrícula:"));
@@ -93,6 +48,50 @@ public class PdfManager {
             status = CourseStatus.REP;
         }
         academicTranscript.addCourse(words[0], status);
+    }
+
+    public AcademicTranscript initializeReadingAndProcessingPdf(String academicTranscriptPath) {
+        AcademicTranscript academicTranscript = new AcademicTranscript();
+        try {
+            PdfDocument pdfDoc = new PdfDocument(new PdfReader(academicTranscriptPath));
+            for (int page = 1; page <= pdfDoc.getNumberOfPages(); page++) {
+                ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                processPage(academicTranscript, PdfTextExtractor.getTextFromPage(pdfDoc.getPage(page), strategy));
+            }
+            pdfDoc.close();
+            return academicTranscript;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void processPage(AcademicTranscript academicTranscript, String pageContent){
+        String [] lines = pageContent.split("\\n");
+        boolean hasRegistrationNumber = false;
+        boolean hasCurrentSemester = false;
+        boolean hasGradePointAverage = false;
+        for (String line : lines) {
+            if (!hasRegistrationNumber && hasRegistrationNumber(line)) {
+                hasRegistrationNumber = true;
+                String[] words = line.split("\\s+");
+                academicTranscript.setRegistrationNumber(words[0]);
+            }
+            if (!hasCurrentSemester && hasCurrentSemester(line)) {
+                hasCurrentSemester = true;
+                String[] words = line.split("\\s+");
+                academicTranscript.setCurrentSemester(Integer.parseInt(words[2].substring(0, Math.min(2, words[2].length()))));
+            }
+            if (!hasGradePointAverage && hasGradePointAverage(line)) {
+                hasGradePointAverage = true;
+                String[] words = line.split("\\s+");
+                academicTranscript.setGradePointAverage(Double.parseDouble(words[4].replaceAll(",", "\\.")));
+            }
+            if (hasGrade(line)) {
+                processGradeLine(academicTranscript, line);
+            }
+        }
     }
 
 }

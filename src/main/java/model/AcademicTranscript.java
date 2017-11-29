@@ -116,8 +116,7 @@ public class AcademicTranscript {
     public boolean isEnrolledAtEnoughCourses(){
         if (enrolledCoursesQuantity >= MIN_ENROlLED_COURSES) return true;
         int coursersToDo = COURSES_QUANTITY_TO_GRADUATE - approvedOnCoursesQuantity;
-        if (coursersToDo == enrolledCoursesQuantity) return true;
-        return false;
+        return coursersToDo == enrolledCoursesQuantity;
     }
 
     public boolean canGraduateOnTime(){

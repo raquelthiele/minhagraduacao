@@ -10,7 +10,7 @@ import java.util.List;
  *
  */
 public class Course {
-    private String code;
+    private final String code;
     private String name;
     private int creditPoints;
     private int flunksQuantity;
@@ -84,8 +84,8 @@ public class Course {
 //        printBuilder.append(lineBreak);
         printBuilder.append(" Status: ");
         printBuilder.append(HtmlGenerator.LINE_BREAK);
-        for(CourseStatus stat : statusList){
-            printBuilder.append("    " + stat.toString());
+        for(CourseStatus status : statusList){
+            printBuilder.append("    ").append(status.toString());
             printBuilder.append(HtmlGenerator.LINE_BREAK);
         }
 

@@ -1,17 +1,15 @@
 package controller;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-import java.io.File;
 import model.AcademicTranscript;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 
 /**
@@ -46,40 +44,38 @@ public class HtmlGenerator {
     }
 
     public String createHtmlCode(String degreeSchedulePath, AcademicTranscript academicTranscript){
-        StringBuilder printBuilder = new StringBuilder();
-        printBuilder.append(HTML_HEADER);
-        printBuilder.append(academicTranscript.toString());
-        printBuilder.append(LINE_BREAK);
-        printBuilder.append(academicTranscript.toString());
-        printBuilder.append(LINE_BREAK);
-        printBuilder.append(LINE_BREAK);
-        printBuilder.append(answerQuestions(academicTranscript));
-        printBuilder.append(LINE_BREAK);
-        printBuilder.append(readSvg(degreeSchedulePath));
-        printBuilder.append(HTML_FOOTER);
-        return printBuilder.toString();
+        String printBuilder = HTML_HEADER +
+                academicTranscript.toString() +
+                LINE_BREAK +
+                academicTranscript.toString() +
+                LINE_BREAK +
+                LINE_BREAK +
+                answerQuestions(academicTranscript) +
+                LINE_BREAK +
+                readSvg(degreeSchedulePath) +
+                HTML_FOOTER;
+        return printBuilder;
     }
 
     private String answerQuestions(AcademicTranscript academicTranscript){
-        StringBuilder printBuilder = new StringBuilder();
-        printBuilder.append("Does the student need to be expelled? ");
-        printBuilder.append(translateYesOrNo(((academicTranscript.getGradePointAverage() <= 4.0)
-                && academicTranscript.hasMoreThanFourFlunksInTheSameCourse())));
-        printBuilder.append(LINE_BREAK);
-        printBuilder.append("Does the student need to submit a plan? ");
-        printBuilder.append(translateYesOrNo(academicTranscript.hasToShowPlan()));
-        printBuilder.append(LINE_BREAK);
-        printBuilder.append("Is the student enrolled in enough courses? ");
-        printBuilder.append(translateYesOrNo(academicTranscript.isEnrolledAtEnoughCourses()));
-        printBuilder.append(LINE_BREAK);
-        printBuilder.append("Is the student able to graduate on time? ");
-        printBuilder.append(translateYesOrNo(academicTranscript.canGraduateOnTime()));
-        printBuilder.append(LINE_BREAK);
-        printBuilder.append("The student's Grade Point Average (GPA) is ");
-        printBuilder.append(translateHigherOrLower(academicTranscript.isGpaHigherOrLowerThanAverage()));
-        printBuilder.append(" than 7.0.");
-        printBuilder.append(LINE_BREAK);
-        return printBuilder.toString();
+        String printBuilder = "Does the student need to be expelled? " +
+                translateYesOrNo(((academicTranscript.getGradePointAverage() <= 4.0)
+                        && academicTranscript.hasMoreThanFourFlunksInTheSameCourse())) +
+                LINE_BREAK +
+                "Does the student need to submit a plan? " +
+                translateYesOrNo(academicTranscript.hasToShowPlan()) +
+                LINE_BREAK +
+                "Is the student enrolled in enough courses? " +
+                translateYesOrNo(academicTranscript.isEnrolledAtEnoughCourses()) +
+                LINE_BREAK +
+                "Is the student able to graduate on time? " +
+                translateYesOrNo(academicTranscript.canGraduateOnTime()) +
+                LINE_BREAK +
+                "The student's Grade Point Average (GPA) is " +
+                translateHigherOrLower(academicTranscript.isGpaHigherOrLowerThanAverage()) +
+                " than 7.0." +
+                LINE_BREAK;
+        return printBuilder;
     }
 
     public String translateYesOrNo(boolean trueOrFalse){
