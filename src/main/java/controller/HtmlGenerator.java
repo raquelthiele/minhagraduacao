@@ -118,6 +118,16 @@ public class HtmlGenerator {
                 String replacedStyleValue = pathStyle.getNodeValue().replaceAll("#ffffff", "#00ff00");
                 pathStyle.setNodeValue(replacedStyleValue);
             }
+            else if (pathId.contains("OPTATIVA")){
+                Node pathStyle = pathElement.getAttributes().getNamedItem("style");
+                String replacedStyleValue = pathStyle.getNodeValue().replaceAll("#ffffff", "#ff0000");
+                pathStyle.setNodeValue(replacedStyleValue);
+            }
+            else if (pathId.contains("ELETIVA")){
+                Node pathStyle = pathElement.getAttributes().getNamedItem("style");
+                String replacedStyleValue = pathStyle.getNodeValue().replaceAll("#ffffff", "#0000ff");
+                pathStyle.setNodeValue(replacedStyleValue);
+            }
         }
         return document;
     }

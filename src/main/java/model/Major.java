@@ -5,7 +5,7 @@ package model;
  */
 public class Major {
 
-    private static final String[] mandatoryMajor = {
+    public static final String[] MANDATORY_COURSES = {
             "TIN0054", // ATIVIDADES CURRICULARES DE EXTENSÃO 1
             "TIN0055", // ATIVIDADES CURRICULARES DE EXTENSÃO 2
             "TIN0056", // ATIVIDADES CURRICULARES DE EXTENSÃO 3
@@ -13,7 +13,7 @@ public class Major {
             "TIN0117", // ADMINISTRAÇÃO FINANCEIRA
             "TME0015", // ÁLGEBRA LINEAR
             "TIN0118", // ANÁLISE DE ALGORITMO
-            "TIN0108", // ANÁLISE DE SISTEMAS
+            "TIN0115", // ANÁLISE DE SISTEMAS
             "TIN0013", // ANÁLISE EMPRESARIAL E ADMIN
             "TIN0120", // BANCO DE DADOS I
             "TIN0169", // BANCO DE DADOS II
@@ -27,10 +27,10 @@ public class Major {
             "TIN0109", // ESTRUTURAS DISCRETAS
             "TIN0112", // FUNDAMENTOS DE SISTEMAS DE INFORMAÇÃO
             "TIN0132", // GERÊNCIA DE PROJ. DE INFORMAT
-            "TIN0110", // INTERAÇÃO HUMANO-COMPUTADOR
+            "TIN0010", // INTERAÇÃO HUMANO-COMPUTADOR
             "TIN0105", // INTRODUÇÃO À LÓGICA COMPUTAC
             "TIN0119", // LINGUAG. FORMAIS E AUTÔMATOS
-            "TME0011", // MATEMÁTICA BÁSICA
+            "TME0101", // MATEMÁTICA BÁSICA
             "TIN0108", // ORGANIZAÇÃO DE COMPUTADORES
             "TME0114", // PROBABILIDADE
             "TIN0122", // PROCESSOS DE SOFTWARE
@@ -47,7 +47,7 @@ public class Major {
             "HTD0058" // TEORIAS E PRÁTICAS DISCURSIVAS
     };
 
-    private static final String[] extraMajor = {
+    public static final String[] OPTINAL_COURSES = {
             "TIN0135", // ADMINISTRAÇÃO DE BANCO DE DADOS
             "TIN0144", // ALGORITMOS PARA PROBLEMAS COMBINATÓRIOS
             "TIN0150", // AMBIENTE OPERACIONAL UNIX
