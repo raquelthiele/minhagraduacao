@@ -1,6 +1,8 @@
 <component name="libraryTable">
   <library name="Maven: com.itextpdf:font-asian:7.0.5">
-    <CLASSES />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/itextpdf/font-asian/7.0.5/font-asian-7.0.5.jar!/" />
+    </CLASSES>
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/com/itextpdf/font-asian/7.0.5/font-asian-7.0.5-javadoc.jar!/" />
     </JAVADOC>
