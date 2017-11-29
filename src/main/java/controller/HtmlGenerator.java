@@ -16,27 +16,85 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 
 /**
- *
+ * Classe do controle responsavel pela geração do HTML do Fluxograma com as cores baseadas no
+ * Fluxograma em SVG lido e no modelo historico.
  */
 public class HtmlGenerator {
+
+    /**
+     * Tag em HTML que pula uma linha.
+     */
     public static final String LINE_BREAK = "<br/>";
+
+    /**
+     * Sim.
+     */
     private static final String YES = "Yes.";
+
+    /**
+     * Não.
+     */
     private static final String NO = "No.";
+
+    /**
+     * Maior.
+     */
     private static final String HIGHER = "higher";
+
+    /**
+     * Menor.
+     */
     private static final String LOWER = "lower";
+
+    /**
+     * Inicio do código HTML.
+     */
     private static final String HTML_HEADER = "<!DOCTYPE html>\n<html>\n<body>\n<h1>Degree Schedule</h1>\n" ;
+
+    /**
+     * Final do código HTML.
+     */
     private static final String HTML_FOOTER = "</body>\n</html>";
+
+    /**
+     * Branco.
+     */
     private static final String WHITE = "#ffffff";
+
+    /**
+     * Vermelho.
+     */
     private static final String RED = "#ff0000";
+
+    /**
+     * Verde.
+     */
     private static final String GREEN = "#00ff00";
+
+    /**
+     * Coeficiente de Rendimento Mínimo.
+     */
     private static final Double MIN_GPA = 4.0;
 
+    /**
+     * Histórico do aluno.
+     */
     private final AcademicTranscript academicTranscript;
 
+    /**
+     * Construtor da classe com a especificação do historico.
+     *
+     * @param academicTranscript Histórico do aluno.
+     */
     public HtmlGenerator(AcademicTranscript academicTranscript) {
         this.academicTranscript = academicTranscript;
     }
 
+    /**
+     * Escreve o aquivo HTML criado na pasta resources do sistema.
+     *
+     * @param degreeSchedulePath Caminho para o Historico do aluno em formato PDF.
+     */
     public void generateHtmlFile(String degreeSchedulePath) {
         BufferedWriter bw = null;
         FileWriter fw = null;
@@ -56,19 +114,25 @@ public class HtmlGenerator {
         }
     }
 
+    /**
+     * Cria o código HTML com o inicio, o historico, as perguntas e suas respostas e o fluxograma pintado.
+     * @param degreeSchedulePath Caminho para o Historico do aluno em formato PDF.
+     * @return Código HTML com o historico, as perguntas e o fluxograma.
+     */
     private String createHtmlCode(String degreeSchedulePath) {
         return HTML_HEADER +
                 academicTranscript +
                 LINE_BREAK +
-                academicTranscript +
-                LINE_BREAK +
-                LINE_BREAK +
                 answerQuestions() +
                 LINE_BREAK +
-                readSvg(degreeSchedulePath) +
+                readAndPaintSvg(degreeSchedulePath) +
                 HTML_FOOTER;
     }
 
+    /**
+     * Responde as perguntas fundamentais do sistema.
+     * @return Perguntas do sistema e suas respostas.
+     */
     private String answerQuestions() {
         return "Does the student need to be expelled? " +
                 translateYesOrNo(((academicTranscript.getGradePointAverage() <= MIN_GPA)
@@ -89,15 +153,31 @@ public class HtmlGenerator {
                 LINE_BREAK;
     }
 
+    /**
+     * Transforma um boolean em Sim ou Não.
+     * @param trueOrFalse Verdadeiro ou Falso.
+     * @return Sim caso verdadeiro e Não caso falso.
+     */
     private String translateYesOrNo(boolean trueOrFalse){
         return (trueOrFalse ? YES : NO);
     }
 
+    /**
+     * Transforma um boolean em maior ou menor.
+     * @param trueOrFalse Verdadeiro ou Falso.
+     * @return Maior caso verdadeiro e Menor caso falso.
+     */
     private String translateHigherOrLower(boolean trueOrFalse){
         return (trueOrFalse ? HIGHER : LOWER);
     }
 
-    private String readSvg(String degreeSchedulePath){
+    /**
+     * Le o arquivo SVG, o transforma em um Document, pinta este e o retorna como String.
+     *
+     * @param degreeSchedulePath Caminho para o Historico do aluno em formato PDF.
+     * @return Código SVG com fluxograma e os cursos feitos pintados.
+     */
+    private String readAndPaintSvg(String degreeSchedulePath){
         String svgFile = null;
         try {
             File fXmlFile = new File(degreeSchedulePath);
@@ -119,6 +199,11 @@ public class HtmlGenerator {
         return svgFile;
     }
 
+    /**
+     * Pinta o SVG de acordo com a situação do curso mais recente.
+     * @param document Arquivo SVG com o fluxograma.
+     * @return Arquivo SVG com o fluxograma com os cursos feitos pintaos.
+     */
     private Document paintSvg(Document document){
         NodeList pathsNodesList = document.getElementsByTagName("path");
         for (int i = 0; i < pathsNodesList.getLength(); i++) {
@@ -126,17 +211,21 @@ public class HtmlGenerator {
             String pathId = pathElement.getAttributes().getNamedItem("id").getNodeValue();
             if (pathId.matches("[A-Z]{3}[0-9]{4}")){
                 selectCourseAndPaint(pathElement, pathId, CourseType.MANDATORY);
-            }
-            else if (pathId.contains("OPTATIVA")){
+            } else if (pathId.contains("OPTATIVA")){
                 selectCourseAndPaint(pathElement, pathId, CourseType.OPTIONAL);
-            }
-            else if (pathId.contains("ELETIVA")){
+            } else if (pathId.contains("ELETIVA")){
                 selectCourseAndPaint(pathElement, pathId, CourseType.ELECTIVE);
             }
         }
         return document;
     }
 
+    /**
+     *  Seleciona o curso no SVG e o pinta caso já tenho sido feito.
+     * @param pathElement Elemento path do SVG.
+     * @param pathId Código do curso.
+     * @param courseType Tipo do curso.
+     */
     private void selectCourseAndPaint(Element pathElement, String pathId, CourseType courseType) {
         String redOrGreen;
         Course course = academicTranscript.getCourse(pathId, courseType);
@@ -147,6 +236,11 @@ public class HtmlGenerator {
         }
     }
 
+    /**
+     *  Pinta o curso já feito de acordo com a situação mais recente.
+     * @param pathElement Elemento path do SVG.
+     * @param redOrGreen Cor que o curso deve ser pintado.
+     */
     private void paintNode(Element pathElement, String redOrGreen) {
         Node pathStyle = pathElement.getAttributes().getNamedItem("style");
         String replacedStyleValue = pathStyle.getNodeValue().replaceAll(WHITE, redOrGreen);
