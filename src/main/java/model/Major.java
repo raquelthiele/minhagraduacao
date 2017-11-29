@@ -1,10 +1,14 @@
 package model;
 
 /**
- *
+ * Classe do modelo que representa a graduação do BSI contendo as listas com os
+ * códigos dos cursos obrigatórios e optativos.
  */
 class Major {
 
+    /**
+     * Lista com os códigos de todos os cursos obrigatórios do BSI.
+     */
     public static final String[] MANDATORY_COURSES = {
             "TIN0054", // ATIVIDADES CURRICULARES DE EXTENSÃO 1
             "TIN0055", // ATIVIDADES CURRICULARES DE EXTENSÃO 2
@@ -47,6 +51,9 @@ class Major {
             "HTD0058" // TEORIAS E PRÁTICAS DISCURSIVAS
     };
 
+    /**
+     * Lista com os códigos de todos os cursos optativos do BSI.
+     */
     public static final String[] OPTINAL_COURSES = {
             "TIN0135", // ADMINISTRAÇÃO DE BANCO DE DADOS
             "TIN0144", // ALGORITMOS PARA PROBLEMAS COMBINATÓRIOS

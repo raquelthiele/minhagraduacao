@@ -6,20 +6,27 @@ import model.AcademicTranscript;
  *
  */
 public class ExecutionPlanner {
-
+    /**
+     *
+     */
     private static ExecutionPlanner instance = null;
     private static String degreeSchedulePath;
     private static String academicTranscriptPath;
 
+    /**
+     *
+     */
     private ExecutionPlanner() {
         // Exists only to defeat instantiation.
     }
 
+    /**
+     * @return
+     */
     public static ExecutionPlanner getInstance() {
         if(instance == null) {
             instance = new ExecutionPlanner();
         }
-        
         return instance;
     }
 

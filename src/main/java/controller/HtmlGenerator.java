@@ -19,11 +19,11 @@ import java.io.*;
  *
  */
 public class HtmlGenerator {
+    public static final String LINE_BREAK = "<br/>";
     private static final String YES = "Yes.";
     private static final String NO = "No.";
     private static final String HIGHER = "higher";
     private static final String LOWER = "lower";
-    public static final String LINE_BREAK = "<br/>";
     private static final String HTML_HEADER = "<!DOCTYPE html>\n<html>\n<body>\n<h1>Degree Schedule</h1>\n" ;
     private static final String HTML_FOOTER = "</body>\n</html>";
     private static final String WHITE = "#ffffff";
@@ -84,7 +84,7 @@ public class HtmlGenerator {
                 translateYesOrNo(academicTranscript.canGraduateOnTime()) +
                 LINE_BREAK +
                 "The student's Grade Point Average (GPA) is " +
-                translateHigherOrLower(academicTranscript.isGpaHigherOrLowerThanAverage()) +
+                translateHigherOrLower(academicTranscript.isGpaHigherThanAverage()) +
                 " than 7.0." +
                 LINE_BREAK;
     }
