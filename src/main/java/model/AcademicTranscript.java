@@ -14,6 +14,8 @@ public class AcademicTranscript {
     private static final Double AVERAGE_GRADE = 7.0;
     private static final Integer MIN_ENROlLED_COURSES = 3;
     private static final Double MAX_COURSES_PER_SEMESTER = 7.0;
+    private static final Integer MAX_SEMESTERS_TO_GRADUATE_NEW = 12;
+    private static final Integer MAX_SEMESTERS_TO_GRADUATE_OLD = 14;
     private static final int FIRST_INDEX = 0;
     private String registrationNumber;
     private Integer registrationDate;
@@ -26,11 +28,11 @@ public class AcademicTranscript {
     private int enrolledCoursesQuantity;
 
     public AcademicTranscript() {
-        this.mandatoryCoursers = new ArrayList<>();
-        this.optionalCoursers = new ArrayList<>();
-        this.electiveCoursers = new ArrayList<>();
-        this.approvedOnCoursesQuantity = 0;
-        this.enrolledCoursesQuantity = 0;
+        mandatoryCoursers = new ArrayList<>();
+        optionalCoursers = new ArrayList<>();
+        electiveCoursers = new ArrayList<>();
+        approvedOnCoursesQuantity = 0;
+        enrolledCoursesQuantity = 0;
     }
 
     public void setRegistrationNumber(String registrationNumber) {
@@ -39,7 +41,8 @@ public class AcademicTranscript {
     }
 
     private void setRegistrationDate(String registrationNumber) {
-        this.registrationDate = Integer.parseInt(registrationNumber.substring(0, Math.min(registrationNumber.length(), 5)));
+        registrationDate = Integer.parseInt(registrationNumber.
+                                    substring(0, Math.min(registrationNumber.length(), 5)));
     }
 
     public void setCurrentSemester(Integer currentSemester) {
@@ -49,21 +52,21 @@ public class AcademicTranscript {
     public void addCourse(String courseCode, CourseStatus status) {
         if (increaseCoursesCount(status)) return;
         boolean hasCourse = false;
-        courseCode = recastSourceCode(courseCode);
+        courseCode = recastCourceCode(courseCode);
         hasCourse = checkIfHasCourseAndAddStatus(courseCode, status, hasCourse);
         if (!hasCourse) createNewCourseAndAddToRespectiveList(courseCode, status);
     }
 
     private boolean increaseCoursesCount(CourseStatus status) {
-        if (status.equals(CourseStatus.ASC)) {
+        if (status == CourseStatus.ASC) {
             enrolledCoursesQuantity++;
             return true;
         }
-        else if (status.equals(CourseStatus.APV)) approvedOnCoursesQuantity++;
+        else if (status == CourseStatus.APV) approvedOnCoursesQuantity++;
         return false;
     }
 
-    private String recastSourceCode(String courseCode) {
+    private String recastCourceCode(String courseCode) {
         if (courseCode.equals("3")) return "HTD0058";
         else if (courseCode.equals("TIN0110")) return "TIN0010";
         return courseCode;
@@ -71,9 +74,9 @@ public class AcademicTranscript {
 
     private void createNewCourseAndAddToRespectiveList(String courseCode, CourseStatus status) {
         Course course = new Course(courseCode, status);
-        if (course.getCourseType().equals(CourseType.MANDATORY)) this.mandatoryCoursers.add(course);
-        if (course.getCourseType().equals(CourseType.OPTIONAL)) this.optionalCoursers.add(course);
-        if (course.getCourseType().equals(CourseType.ELECTIVE)) this.electiveCoursers.add(course);
+        if (course.getCourseType() == CourseType.MANDATORY) mandatoryCoursers.add(course);
+        if (course.getCourseType() == CourseType.OPTIONAL) optionalCoursers.add(course);
+        if (course.getCourseType() == CourseType.ELECTIVE) electiveCoursers.add(course);
     }
 
     private boolean checkIfHasCourseAndAddStatus(String courseCode, CourseStatus status, boolean hasCourse) {
@@ -131,9 +134,9 @@ public class AcademicTranscript {
     public boolean hasToShowPlan(){
         int compareTo = registrationDate.compareTo(SECOND_REGULATION);
         if(compareTo >= 0 ){
-            if (this.currentSemester > 6) return true;
+            if (currentSemester > 6) return true;
         } else {
-            if (this.currentSemester > 10) return true;
+            if (currentSemester > 10) return true;
         }
         return  false;
     }
@@ -149,29 +152,29 @@ public class AcademicTranscript {
         int semestersNeededToGraduate = ((int) Math.ceil(coursersToDo / MAX_COURSES_PER_SEMESTER));
         int compareTo = registrationDate.compareTo(SECOND_REGULATION);
         if(compareTo >= 0 ){
-            if ((currentSemester + semestersNeededToGraduate - 1) >= 12) return false;
+            if ((currentSemester + semestersNeededToGraduate - 1) >= MAX_SEMESTERS_TO_GRADUATE_NEW) return false;
         } else {
-            if ((currentSemester + semestersNeededToGraduate -1) >= 14) return false;
+            if ((currentSemester + semestersNeededToGraduate -1) >= MAX_SEMESTERS_TO_GRADUATE_OLD) return false;
         }
         return true;
     }
 
     public  boolean isGpaHigherOrLowerThanAverage(){
-        return (this.gradePointAverage >= AVERAGE_GRADE);
+        return (gradePointAverage >= AVERAGE_GRADE);
     }
 
     public Course getCourse(String courseCode, CourseType courseType) {
-        if (courseType.equals(CourseType.MANDATORY)) {
+        if (courseType == CourseType.MANDATORY) {
             for (Course mandatoryCourse : mandatoryCoursers) {
                 if (mandatoryCourse.getCode().equals(courseCode)) return mandatoryCourse;
             }
         }
-        if ((courseType.equals(CourseType.OPTIONAL)) && (optionalCoursers.size() > 0)) {
+        if ((courseType == CourseType.OPTIONAL) && (optionalCoursers.size() > 0)) {
             if (removeCoursesUntilApv(CourseType.OPTIONAL)) return null;
             return optionalCoursers.remove(FIRST_INDEX);
 
         }
-        if (courseType.equals(CourseType.ELECTIVE) && (electiveCoursers.size() > 0)) {
+        if (courseType == CourseType.ELECTIVE && (electiveCoursers.size() > 0)) {
             if (removeCoursesUntilApv(CourseType.ELECTIVE)) return null;
             return electiveCoursers.remove(FIRST_INDEX);
         }
@@ -180,9 +183,9 @@ public class AcademicTranscript {
 
     private boolean removeCoursesUntilApv(CourseType courseType) {
         List<Course> courses;
-        if (courseType.equals(CourseType.OPTIONAL)) courses = optionalCoursers;
+        if (courseType == CourseType.OPTIONAL) courses = optionalCoursers;
         else courses = electiveCoursers;
-        while (!courses.get(FIRST_INDEX).lastStatus().equals(CourseStatus.APV)) {
+        while (courses.get(FIRST_INDEX).lastStatus() != CourseStatus.APV) {
             courses.remove(FIRST_INDEX);
             if (courses.size() < 1) return true;
         }
@@ -193,32 +196,32 @@ public class AcademicTranscript {
     public String toString(){
         StringBuilder printBuilder = new StringBuilder();
         printBuilder.append("Student Registration Number: ");
-        printBuilder.append(this.registrationNumber);
+        printBuilder.append(registrationNumber);
         printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append("Student Registration Date: ");
-        printBuilder.append(this.registrationDate.toString());
+        printBuilder.append(registrationDate);
         printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append("Student Current Semester: ");
-        printBuilder.append(this.currentSemester.toString());
+        printBuilder.append(currentSemester);
         printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append("Student Grade Point Average: ");
-        printBuilder.append(this.gradePointAverage);
+        printBuilder.append(gradePointAverage);
         printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append("Mandatory Courses: ");
         printBuilder.append(HtmlGenerator.LINE_BREAK);
-        for(Course course : this.mandatoryCoursers){
+        for(Course course : mandatoryCoursers){
             printBuilder.append(course);
         }
         printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append("Optional Courses: ");
         printBuilder.append(HtmlGenerator.LINE_BREAK);
-        for(Course course : this.optionalCoursers){
+        for(Course course : optionalCoursers){
             printBuilder.append(course);
         }
         printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append("Elective Courses: ");
         printBuilder.append(HtmlGenerator.LINE_BREAK);
-        for(Course course : this.electiveCoursers){
+        for(Course course : electiveCoursers){
             printBuilder.append(course);
         }
         return  printBuilder.toString();

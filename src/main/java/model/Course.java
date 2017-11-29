@@ -17,10 +17,10 @@ public class Course {
 
     public Course(String code, CourseStatus courseStatus) {
         this.code = code;
-        this.courseType = evaluateCourseType();
-        this.flunksQuantity = 0;
-        this.statusList = new ArrayList<>();
-        this.statusList.add(courseStatus);
+        courseType = evaluateCourseType();
+        flunksQuantity = 0;
+        statusList = new ArrayList<>();
+        statusList.add(courseStatus);
     }
 
     public String getCode() {
@@ -36,13 +36,13 @@ public class Course {
     }
 
     public void addStatus(CourseStatus status) {
-        if(status.equals(CourseStatus.ASC)){
+        if(status == CourseStatus.ASC){
             return;
         }
-        else if(status.equals(CourseStatus.REF) || status.equals(CourseStatus.REP)){
+        else if(status == CourseStatus.REF || status == CourseStatus.REP){
             flunksQuantity++;
         }
-        this.statusList.add(status);
+        statusList.add(status);
     }
 
     public CourseStatus lastStatus(){
@@ -50,8 +50,8 @@ public class Course {
     }
 
     private CourseType evaluateCourseType() {
-        if (Arrays.asList(Major.MANDATORY_COURSES).contains(this.code)) return CourseType.MANDATORY;
-        else if (Arrays.asList(Major.OPTINAL_COURSES).contains(this.code)) return CourseType.OPTIONAL;
+        if (Arrays.asList(Major.MANDATORY_COURSES).contains(code)) return CourseType.MANDATORY;
+        else if (Arrays.asList(Major.OPTINAL_COURSES).contains(code)) return CourseType.OPTIONAL;
         else return CourseType.ELECTIVE;
     }
 
@@ -60,15 +60,15 @@ public class Course {
         StringBuilder printBuilder = new StringBuilder("--------------");
         printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append(" Course Code: ");
-        printBuilder.append(this.code);
+        printBuilder.append(code);
         printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append(" Course Type: ");
-        printBuilder.append(this.courseType);
+        printBuilder.append(courseType);
         printBuilder.append(HtmlGenerator.LINE_BREAK);
         printBuilder.append(" Status: ");
         printBuilder.append(HtmlGenerator.LINE_BREAK);
         for(CourseStatus status : statusList){
-            printBuilder.append("    ").append(status.toString());
+            printBuilder.append("    ").append(status);
             printBuilder.append(HtmlGenerator.LINE_BREAK);
         }
 

@@ -29,6 +29,7 @@ public class HtmlGenerator {
     private static final String WHITE = "#ffffff";
     private static final String RED = "#ff0000";
     private static final String GREEN = "#00ff00";
+    private static final Double MIN_GPA = 4.0;
 
     private final AcademicTranscript academicTranscript;
 
@@ -57,9 +58,9 @@ public class HtmlGenerator {
 
     private String createHtmlCode(String degreeSchedulePath) {
         return HTML_HEADER +
-                academicTranscript.toString() +
+                academicTranscript +
                 LINE_BREAK +
-                academicTranscript.toString() +
+                academicTranscript +
                 LINE_BREAK +
                 LINE_BREAK +
                 answerQuestions() +
@@ -70,7 +71,7 @@ public class HtmlGenerator {
 
     private String answerQuestions() {
         return "Does the student need to be expelled? " +
-                translateYesOrNo(((academicTranscript.getGradePointAverage() <= 4.0)
+                translateYesOrNo(((academicTranscript.getGradePointAverage() <= MIN_GPA)
                         && academicTranscript.hasMoreThanFourFlunksInTheSameCourse())) +
                 LINE_BREAK +
                 "Does the student need to submit a plan? " +
@@ -140,7 +141,7 @@ public class HtmlGenerator {
         String redOrGreen;
         Course course = academicTranscript.getCourse(pathId, courseType);
         if (course != null) {
-            if (course.lastStatus().equals(CourseStatus.APV)) redOrGreen = GREEN;
+            if (course.lastStatus() == CourseStatus.APV) redOrGreen = GREEN;
             else redOrGreen = RED;
             paintNode(pathElement, redOrGreen);
         }

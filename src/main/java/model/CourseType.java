@@ -16,6 +16,6 @@ public enum CourseType {
 
     @Override
     public String toString() {
-        return this.courseType;
+        return courseType;
     }
 }

@@ -29,7 +29,10 @@ import java.io.IOException;
     }
 
     private static boolean hasGrade(String line){
-        return ( line.contains("ASC - Matrícula") || line.contains("APV") || line.contains("REF") || line.contains("REP "));
+        return ( line.contains("ASC - Matrícula")
+                || line.contains("APV")
+                || line.contains("REF")
+                || line.contains("REP "));
     }
 
     private static void processGradeLine(AcademicTranscript academicTranscript, String line){
@@ -81,7 +84,8 @@ import java.io.IOException;
             if (!hasCurrentSemester && hasCurrentSemester(line)) {
                 hasCurrentSemester = true;
                 String[] words = line.split("\\s+");
-                academicTranscript.setCurrentSemester(Integer.parseInt(words[2].substring(0, Math.min(2, words[2].length()))));
+                academicTranscript.setCurrentSemester(
+                        Integer.parseInt(words[2].substring(0, Math.min(2, words[2].length()))));
             }
             if (!hasGradePointAverage && hasGradePointAverage(line)) {
                 hasGradePointAverage = true;
