@@ -3,7 +3,7 @@ package model;
 /**
  *
  */
-public class Major {
+class Major {
 
     public static final String[] MANDATORY_COURSES = {
             "TIN0054", // ATIVIDADES CURRICULARES DE EXTENSÃO 1

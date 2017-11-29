@@ -11,9 +11,8 @@ public class Main {
             System.exit(1);
         }
 
-        ExecutionPlanner executionPlanner = ExecutionPlanner.getInstance();
-        ExecutionPlanner.setDegreeSchedulePath(args[0]);
-        ExecutionPlanner.setAcademicTranscriptPath(args[1]);
-        ExecutionPlanner.run();
+        ExecutionPlanner.getInstance().setDegreeSchedulePath(args[0]);
+        ExecutionPlanner.getInstance().setAcademicTranscriptPath(args[1]);
+        ExecutionPlanner.getInstance().run();
     }
 }

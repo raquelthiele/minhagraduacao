@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Classe que representa o historico de um aluno
+ * Classe que representa o historico de um aluno.
  */
 public class AcademicTranscript {
-    private static final Integer FIRST_REGULATION = 20132;
     private static final Integer SECOND_REGULATION = 20141;
     private static final Integer COURSES_QUANTITY_TO_GRADUATE = 47;
     private static final Double AVERAGE_GRADE = 7.0;
@@ -22,7 +21,6 @@ public class AcademicTranscript {
     private List<Course> mandatoryCoursers;
     private List<Course> optionalCoursers;
     private List<Course> electiveCoursers;
-    private int totalCreditPoints;
     private Double gradePointAverage;
     private int approvedOnCoursesQuantity;
     private int enrolledCoursesQuantity;
@@ -35,41 +33,17 @@ public class AcademicTranscript {
         this.enrolledCoursesQuantity = 0;
     }
 
-    public String getRegistrationNumber() {
-        return registrationNumber;
-    }
-
     public void setRegistrationNumber(String registrationNumber) {
         this.registrationNumber = registrationNumber;
         setRegistrationDate(this.registrationNumber);
     }
 
-    public int getRegistrationDate() {
-        return registrationDate;
-    }
-
-    public void setRegistrationDate(String registrationNumber) {
+    private void setRegistrationDate(String registrationNumber) {
         this.registrationDate = Integer.parseInt(registrationNumber.substring(0, Math.min(registrationNumber.length(), 5)));
-    }
-
-    public Integer getCurrentSemester() {
-        return currentSemester;
     }
 
     public void setCurrentSemester(Integer currentSemester) {
         this.currentSemester = currentSemester;
-    }
-
-    public List<Course> getMandatoryCoursers() {
-        return mandatoryCoursers;
-    }
-
-    public List<Course> getOptionalCoursers() {
-        return optionalCoursers;
-    }
-
-    public List<Course> getElectiveCoursers() {
-        return electiveCoursers;
     }
 
     public void addCourse(String courseCode, CourseStatus status) {
@@ -125,14 +99,6 @@ public class AcademicTranscript {
             }
         }
         return hasCourse;
-    }
-
-    public int getTotalCreditPoints() {
-        return totalCreditPoints;
-    }
-
-    public void setTotalCreditPoints(int totalCreditPoints) {
-        this.totalCreditPoints = totalCreditPoints;
     }
 
     public Double getGradePointAverage() {

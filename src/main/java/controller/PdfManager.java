@@ -14,7 +14,7 @@ import java.io.IOException;
  * Classe responsavel pela leitura e processamento do pdf.
  *
  */
-public class PdfManager {
+ class PdfManager {
 
     private static boolean hasRegistrationNumber(String line){
         return ( line.contains("Matrícula:"));

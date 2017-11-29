@@ -11,7 +11,7 @@ public class ExecutionPlanner {
     private static String degreeSchedulePath;
     private static String academicTranscriptPath;
 
-    protected ExecutionPlanner() {
+    private ExecutionPlanner() {
         // Exists only to defeat instantiation.
     }
 
@@ -22,23 +22,15 @@ public class ExecutionPlanner {
         return instance;
     }
 
-    public static String getDegreeSchedulePath() {
-        return degreeSchedulePath;
-    }
-
-    public static void setDegreeSchedulePath(String degreeSchedulePath) {
+    public void setDegreeSchedulePath(String degreeSchedulePath) {
         ExecutionPlanner.degreeSchedulePath = degreeSchedulePath;
     }
 
-    public static String getAcademicTranscriptPath() {
-        return academicTranscriptPath;
-    }
-
-    public static void setAcademicTranscriptPath(String academicTranscriptPath) {
+    public void setAcademicTranscriptPath(String academicTranscriptPath) {
         ExecutionPlanner.academicTranscriptPath = academicTranscriptPath;
     }
 
-    public static void run(){
+    public void run(){
         PdfManager manager = new PdfManager();
         AcademicTranscript academicTranscript = manager.initializeReadingAndProcessingPdf(academicTranscriptPath);
 

@@ -19,10 +19,10 @@ import java.io.*;
  *
  */
 public class HtmlGenerator {
-    public static final String YES = "Yes.";
-    public static final String NO = "No.";
-    public static final String HIGHER = "higher";
-    public static final String LOWER = "lower";
+    private static final String YES = "Yes.";
+    private static final String NO = "No.";
+    private static final String HIGHER = "higher";
+    private static final String LOWER = "lower";
     public static final String LINE_BREAK = "<br/>";
     private static final String HTML_HEADER = "<!DOCTYPE html>\n<html>\n<body>\n<h1>Degree Schedule</h1>\n" ;
     private static final String HTML_FOOTER = "</body>\n</html>";
@@ -30,7 +30,7 @@ public class HtmlGenerator {
     private static final String RED = "#ff0000";
     private static final String GREEN = "#00ff00";
 
-    private AcademicTranscript academicTranscript;
+    private final AcademicTranscript academicTranscript;
 
     public HtmlGenerator(AcademicTranscript academicTranscript) {
         this.academicTranscript = academicTranscript;
@@ -55,8 +55,8 @@ public class HtmlGenerator {
         }
     }
 
-    public String createHtmlCode(String degreeSchedulePath) {
-        String printBuilder = HTML_HEADER +
+    private String createHtmlCode(String degreeSchedulePath) {
+        return HTML_HEADER +
                 academicTranscript.toString() +
                 LINE_BREAK +
                 academicTranscript.toString() +
@@ -66,11 +66,10 @@ public class HtmlGenerator {
                 LINE_BREAK +
                 readSvg(degreeSchedulePath) +
                 HTML_FOOTER;
-        return printBuilder;
     }
 
     private String answerQuestions() {
-        String printBuilder = "Does the student need to be expelled? " +
+        return "Does the student need to be expelled? " +
                 translateYesOrNo(((academicTranscript.getGradePointAverage() <= 4.0)
                         && academicTranscript.hasMoreThanFourFlunksInTheSameCourse())) +
                 LINE_BREAK +
@@ -87,14 +86,13 @@ public class HtmlGenerator {
                 translateHigherOrLower(academicTranscript.isGpaHigherOrLowerThanAverage()) +
                 " than 7.0." +
                 LINE_BREAK;
-        return printBuilder;
     }
 
-    public String translateYesOrNo(boolean trueOrFalse){
+    private String translateYesOrNo(boolean trueOrFalse){
         return (trueOrFalse ? YES : NO);
     }
 
-    public String translateHigherOrLower(boolean trueOrFalse){
+    private String translateHigherOrLower(boolean trueOrFalse){
         return (trueOrFalse ? HIGHER : LOWER);
     }
 
@@ -107,7 +105,7 @@ public class HtmlGenerator {
             Document doc = dBuilder.parse(fXmlFile);
             doc.getDocumentElement().normalize();
 
-            paintSvg(doc);
+            doc = paintSvg(doc);
 
             StringWriter stringOut = new StringWriter();
             OutputFormat format = new OutputFormat(doc);
@@ -125,31 +123,20 @@ public class HtmlGenerator {
         for (int i = 0; i < pathsNodesList.getLength(); i++) {
             Element pathElement = (Element) pathsNodesList.item(i);
             String pathId = pathElement.getAttributes().getNamedItem("id").getNodeValue();
-            String redOrGreen = GREEN;
             if (pathId.matches("[A-Z]{3}[0-9]{4}")){
-                selectCourseAndColor(pathElement, pathId, CourseType.MANDATORY);
+                selectCourseAndPaint(pathElement, pathId, CourseType.MANDATORY);
             }
             else if (pathId.contains("OPTATIVA")){
-                selectCourseAndColor(pathElement, pathId, CourseType.OPTIONAL);
+                selectCourseAndPaint(pathElement, pathId, CourseType.OPTIONAL);
             }
             else if (pathId.contains("ELETIVA")){
-                selectCourseAndColor(pathElement, pathId, CourseType.ELECTIVE);
-            }
-            else if (pathId.contains("OPTATIVA")){
-                Node pathStyle = pathElement.getAttributes().getNamedItem("style");
-                String replacedStyleValue = pathStyle.getNodeValue().replaceAll("#ffffff", "#ff0000");
-                pathStyle.setNodeValue(replacedStyleValue);
-            }
-            else if (pathId.contains("ELETIVA")){
-                Node pathStyle = pathElement.getAttributes().getNamedItem("style");
-                String replacedStyleValue = pathStyle.getNodeValue().replaceAll("#ffffff", "#0000ff");
-                pathStyle.setNodeValue(replacedStyleValue);
+                selectCourseAndPaint(pathElement, pathId, CourseType.ELECTIVE);
             }
         }
         return document;
     }
 
-    private void selectCourseAndColor(Element pathElement, String pathId, CourseType courseType) {
+    private void selectCourseAndPaint(Element pathElement, String pathId, CourseType courseType) {
         String redOrGreen;
         Course course = academicTranscript.getCourse(pathId, courseType);
         if (course != null) {
