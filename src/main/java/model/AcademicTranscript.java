@@ -9,24 +9,28 @@ import java.util.List;
  * Classe que representa o historico de um aluno
  */
 public class AcademicTranscript {
-    private String registrationNumber;
-    private Integer registrationDate;
-    private Integer currentSemester;
-    private List<Course> coursers;
-    private int totalCreditPoints;
-    private Double gradePointAverage;
-    private int approvedOnCoursesQuantity;
-    private int enrolledCoursesQuantity;
-
     private static final Integer FIRST_REGULATION = 20132;
     private static final Integer SECOND_REGULATION = 20141;
     private static final Integer COURSES_QUANTITY_TO_GRADUATE = 47;
     private static final Double AVERAGE_GRADE = 7.0;
     private static final Integer MIN_ENROlLED_COURSES = 3;
     private static final Double MAX_COURSES_PER_SEMESTER = 7.0;
+    private static final int FIRST_INDEX = 0;
+    private String registrationNumber;
+    private Integer registrationDate;
+    private Integer currentSemester;
+    private List<Course> mandatoryCoursers;
+    private List<Course> optionalCoursers;
+    private List<Course> electiveCoursers;
+    private int totalCreditPoints;
+    private Double gradePointAverage;
+    private int approvedOnCoursesQuantity;
+    private int enrolledCoursesQuantity;
 
     public AcademicTranscript() {
-        this.coursers = new ArrayList<Course>();
+        this.mandatoryCoursers = new ArrayList<>();
+        this.optionalCoursers = new ArrayList<>();
+        this.electiveCoursers = new ArrayList<>();
         this.approvedOnCoursesQuantity = 0;
         this.enrolledCoursesQuantity = 0;
     }
@@ -56,26 +60,71 @@ public class AcademicTranscript {
         this.currentSemester = currentSemester;
     }
 
-    public List<Course> getCoursers() {
-        return coursers;
+    public List<Course> getMandatoryCoursers() {
+        return mandatoryCoursers;
+    }
+
+    public List<Course> getOptionalCoursers() {
+        return optionalCoursers;
+    }
+
+    public List<Course> getElectiveCoursers() {
+        return electiveCoursers;
     }
 
     public void addCourse(String courseCode, CourseStatus status) {
+        if (increaseCoursesCount(status)) return;
         boolean hasCourse = false;
-        for(Course course : coursers){
+        courseCode = recastSourceCode(courseCode);
+        hasCourse = checkIfHasCourseAndAddStatus(courseCode, status, hasCourse);
+        if (!hasCourse) createNewCourseAndAddToRespectiveList(courseCode, status);
+    }
+
+    private boolean increaseCoursesCount(CourseStatus status) {
+        if (status.equals(CourseStatus.ASC)) {
+            enrolledCoursesQuantity++;
+            return true;
+        }
+        else if (status.equals(CourseStatus.APV)) approvedOnCoursesQuantity++;
+        return false;
+    }
+
+    private String recastSourceCode(String courseCode) {
+        if (courseCode.equals("3")) return "HTD0058";
+        else if (courseCode.equals("TIN0110")) return "TIN0010";
+        return courseCode;
+    }
+
+    private void createNewCourseAndAddToRespectiveList(String courseCode, CourseStatus status) {
+        Course course = new Course(courseCode, status);
+        if (course.getCourseType().equals(CourseType.MANDATORY)) this.mandatoryCoursers.add(course);
+        if (course.getCourseType().equals(CourseType.OPTIONAL)) this.optionalCoursers.add(course);
+        if (course.getCourseType().equals(CourseType.ELECTIVE)) this.electiveCoursers.add(course);
+    }
+
+    private boolean checkIfHasCourseAndAddStatus(String courseCode, CourseStatus status, boolean hasCourse) {
+        for(Course course : mandatoryCoursers){
             if(course.getCode().equals(courseCode)){
                 course.addStatus(status);
                 hasCourse = true;
                 break;
             }
         }
-        if (!hasCourse){
-            Course course = new Course(courseCode);
-            course.addStatus(status);
-            this.coursers.add(course);
+        for(Course course : optionalCoursers){
+            if(course.getCode().equals(courseCode)){
+                course.addStatus(status);
+                hasCourse = true;
+                break;
+            }
         }
-        if (status.equals(CourseStatus.ASC)) enrolledCoursesQuantity++;
-        else if (status.equals(CourseStatus.APV)) approvedOnCoursesQuantity++;
+        for(Course course : electiveCoursers){
+            if(course.getCode().equals(courseCode)){
+                course.addStatus(status);
+                hasCourse = true;
+                break;
+            }
+        }
+        return hasCourse;
     }
 
     public int getTotalCreditPoints() {
@@ -95,7 +144,17 @@ public class AcademicTranscript {
     }
 
     public boolean hasMoreThanFourFlunksInTheSameCourse(){
-        for (Course course : coursers){
+        for (Course course : mandatoryCoursers){
+            if (course.getFlunksQuantity() >= 4){
+                return true;
+            }
+        }
+        for (Course course : optionalCoursers){
+            if (course.getFlunksQuantity() >= 4){
+                return true;
+            }
+        }
+        for (Course course : electiveCoursers){
             if (course.getFlunksQuantity() >= 4){
                 return true;
             }
@@ -135,6 +194,35 @@ public class AcademicTranscript {
         return (this.gradePointAverage >= AVERAGE_GRADE);
     }
 
+    public Course getCourse(String courseCode, CourseType courseType) {
+        if (courseType.equals(CourseType.MANDATORY)) {
+            for (Course mandatoryCourse : mandatoryCoursers) {
+                if (mandatoryCourse.getCode().equals(courseCode)) return mandatoryCourse;
+            }
+        }
+        if ((courseType.equals(CourseType.OPTIONAL)) && (optionalCoursers.size() > 0)) {
+            if (removeCoursesUntilApv(CourseType.OPTIONAL)) return null;
+            return optionalCoursers.remove(FIRST_INDEX);
+
+        }
+        if (courseType.equals(CourseType.ELECTIVE) && (electiveCoursers.size() > 0)) {
+            if (removeCoursesUntilApv(CourseType.ELECTIVE)) return null;
+            return electiveCoursers.remove(FIRST_INDEX);
+        }
+        return null;
+    }
+
+    private boolean removeCoursesUntilApv(CourseType courseType) {
+        List<Course> courses;
+        if (courseType.equals(CourseType.OPTIONAL)) courses = optionalCoursers;
+        else courses = electiveCoursers;
+        while (!courses.get(FIRST_INDEX).lastStatus().equals(CourseStatus.APV)) {
+            courses.remove(FIRST_INDEX);
+            if (courses.size() < 1) return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString(){
         StringBuilder printBuilder = new StringBuilder();
@@ -150,9 +238,21 @@ public class AcademicTranscript {
         printBuilder.append("Student Grade Point Average: ");
         printBuilder.append(this.gradePointAverage);
         printBuilder.append(HtmlGenerator.LINE_BREAK);
-        printBuilder.append("Courses: ");
+        printBuilder.append("Mandatory Courses: ");
         printBuilder.append(HtmlGenerator.LINE_BREAK);
-        for(Course course : this.coursers){
+        for(Course course : this.mandatoryCoursers){
+            printBuilder.append(course);
+        }
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
+        printBuilder.append("Optional Courses: ");
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
+        for(Course course : this.optionalCoursers){
+            printBuilder.append(course);
+        }
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
+        printBuilder.append("Elective Courses: ");
+        printBuilder.append(HtmlGenerator.LINE_BREAK);
+        for(Course course : this.electiveCoursers){
             printBuilder.append(course);
         }
         return  printBuilder.toString();

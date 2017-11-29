@@ -3,6 +3,9 @@ package controller;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import model.AcademicTranscript;
+import model.Course;
+import model.CourseStatus;
+import model.CourseType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -23,14 +26,23 @@ public class HtmlGenerator {
     public static final String LINE_BREAK = "<br/>";
     private static final String HTML_HEADER = "<!DOCTYPE html>\n<html>\n<body>\n<h1>Degree Schedule</h1>\n" ;
     private static final String HTML_FOOTER = "</body>\n</html>";
+    private static final String WHITE = "#ffffff";
+    private static final String RED = "#ff0000";
+    private static final String GREEN = "#00ff00";
 
-    public void generateHtmlFile(String degreeSchedulePath, AcademicTranscript academicTranscript) {
+    private AcademicTranscript academicTranscript;
+
+    public HtmlGenerator(AcademicTranscript academicTranscript) {
+        this.academicTranscript = academicTranscript;
+    }
+
+    public void generateHtmlFile(String degreeSchedulePath) {
         BufferedWriter bw = null;
         FileWriter fw = null;
         try {
             fw = new FileWriter("src\\main\\resources\\DegreeSchedule.html");
             bw = new BufferedWriter(fw);
-            bw.write(createHtmlCode(degreeSchedulePath, academicTranscript));
+            bw.write(createHtmlCode(degreeSchedulePath));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -43,21 +55,21 @@ public class HtmlGenerator {
         }
     }
 
-    public String createHtmlCode(String degreeSchedulePath, AcademicTranscript academicTranscript){
+    public String createHtmlCode(String degreeSchedulePath) {
         String printBuilder = HTML_HEADER +
                 academicTranscript.toString() +
                 LINE_BREAK +
                 academicTranscript.toString() +
                 LINE_BREAK +
                 LINE_BREAK +
-                answerQuestions(academicTranscript) +
+                answerQuestions() +
                 LINE_BREAK +
                 readSvg(degreeSchedulePath) +
                 HTML_FOOTER;
         return printBuilder;
     }
 
-    private String answerQuestions(AcademicTranscript academicTranscript){
+    private String answerQuestions() {
         String printBuilder = "Does the student need to be expelled? " +
                 translateYesOrNo(((academicTranscript.getGradePointAverage() <= 4.0)
                         && academicTranscript.hasMoreThanFourFlunksInTheSameCourse())) +
@@ -113,12 +125,33 @@ public class HtmlGenerator {
         for (int i = 0; i < pathsNodesList.getLength(); i++) {
             Element pathElement = (Element) pathsNodesList.item(i);
             String pathId = pathElement.getAttributes().getNamedItem("id").getNodeValue();
+            String redOrGreen = GREEN;
             if (pathId.matches("[A-Z]{3}[0-9]{4}")){
-                Node pathStyle = pathElement.getAttributes().getNamedItem("style");
-                String replacedStyleValue = pathStyle.getNodeValue().replaceAll("#ffffff", "#00ff00");
-                pathStyle.setNodeValue(replacedStyleValue);
+                selectCourseAndColor(pathElement, pathId, CourseType.MANDATORY);
+            }
+            else if (pathId.contains("OPTATIVA")){
+                selectCourseAndColor(pathElement, pathId, CourseType.OPTIONAL);
+            }
+            else if (pathId.contains("ELETIVA")){
+                selectCourseAndColor(pathElement, pathId, CourseType.ELECTIVE);
             }
         }
         return document;
+    }
+
+    private void selectCourseAndColor(Element pathElement, String pathId, CourseType courseType) {
+        String redOrGreen;
+        Course course = academicTranscript.getCourse(pathId, courseType);
+        if (course != null) {
+            if (course.lastStatus().equals(CourseStatus.APV)) redOrGreen = GREEN;
+            else redOrGreen = RED;
+            paintNode(pathElement, redOrGreen);
+        }
+    }
+
+    private void paintNode(Element pathElement, String redOrGreen) {
+        Node pathStyle = pathElement.getAttributes().getNamedItem("style");
+        String replacedStyleValue = pathStyle.getNodeValue().replaceAll(WHITE, redOrGreen);
+        pathStyle.setNodeValue(replacedStyleValue);
     }
 }
