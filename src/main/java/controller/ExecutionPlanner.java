@@ -19,6 +19,7 @@ public class ExecutionPlanner {
         if(instance == null) {
             instance = new ExecutionPlanner();
         }
+        
         return instance;
     }
 
