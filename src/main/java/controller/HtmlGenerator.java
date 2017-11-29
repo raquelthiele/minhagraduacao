@@ -135,6 +135,16 @@ public class HtmlGenerator {
             else if (pathId.contains("ELETIVA")){
                 selectCourseAndColor(pathElement, pathId, CourseType.ELECTIVE);
             }
+            else if (pathId.contains("OPTATIVA")){
+                Node pathStyle = pathElement.getAttributes().getNamedItem("style");
+                String replacedStyleValue = pathStyle.getNodeValue().replaceAll("#ffffff", "#ff0000");
+                pathStyle.setNodeValue(replacedStyleValue);
+            }
+            else if (pathId.contains("ELETIVA")){
+                Node pathStyle = pathElement.getAttributes().getNamedItem("style");
+                String replacedStyleValue = pathStyle.getNodeValue().replaceAll("#ffffff", "#0000ff");
+                pathStyle.setNodeValue(replacedStyleValue);
+            }
         }
         return document;
     }
